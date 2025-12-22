@@ -3,13 +3,16 @@ import {
   Injectable,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { UsersDocumentRepository } from './infrastructure/persistence/repositories/user.repository';
+import * as bcrypt from 'bcryptjs';
+import { AuthProvidersEnum } from 'src/auth/auth-providers.enum';
+import { PaginationOptions } from 'src/common/base/repositories/pagination-options.interface';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { PaginationResponseDto } from 'src/common/dto/pagination-response.dto';
+import { NullableType } from 'src/utils/types/nullable.type';
 import { User } from './domain/user';
 import { CreateUserDto } from './dto/create-user.dto';
-import bcrypt from 'bcryptjs';
-import { AuthProvidersEnum } from 'src/auth/auth-providers.enum';
-import { NullableType } from 'src/utils/types/nullable.type';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersDocumentRepository } from './infrastructure/persistence/repositories/user.repository';
 
 @Injectable()
 export class UsersService {
@@ -24,7 +27,9 @@ export class UsersService {
 
     let email: string | null = null;
     if (createUserDto.email) {
-      const userObject = this.usersRepository.findByEmail(createUserDto.email);
+      const userObject = await this.usersRepository.findByEmail(
+        createUserDto.email,
+      );
       if (userObject) {
         throw new UnprocessableEntityException({
           status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -53,6 +58,14 @@ export class UsersService {
 
   findByIds(ids: User['id'][]): Promise<User[]> {
     return this.usersRepository.findByIds(ids);
+  }
+
+  paginate(
+    query: PaginationQueryDto,
+    search?: string,
+    options?: PaginationOptions<any>,
+  ): Promise<PaginationResponseDto<User>> {
+    return this.usersRepository.paginate(query, options ?? ({} as any), search);
   }
 
   findByEmail(email: User['email']): Promise<NullableType<User>> {

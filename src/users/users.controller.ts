@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -21,6 +22,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './domain/user';
 import { NullableType } from 'src/utils/types/nullable.type';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PaginationResponseDto } from 'src/common/dto/pagination-response.dto';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 
 @ApiBearerAuth()
 @ApiTags('Users')
@@ -75,5 +78,15 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: User['id']): Promise<void> {
     return this.usersService.remove(id);
+  }
+
+  @ApiOkResponse({ type: PaginationResponseDto })
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  findAll(
+    @Query() query: PaginationQueryDto,
+    @Query('search') search?: string,
+  ): Promise<PaginationResponseDto<User>> {
+    return this.usersService.paginate(query, search);
   }
 }

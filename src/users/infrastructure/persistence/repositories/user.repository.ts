@@ -1,17 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserSchemaClass } from '../entities/user.schema';
 import { Model } from 'mongoose';
+import { BaseRepository } from 'src/common/base/repositories/base.repository';
+import { PaginationOptions } from 'src/common/base/repositories/pagination-options.interface';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { PaginationResponseDto } from 'src/common/dto/pagination-response.dto';
 import { User } from 'src/users/domain/user';
-import { UserMapper } from '../mappers/user.mapper';
 import { NullableType } from 'src/utils/types/nullable.type';
+import { UserSchemaClass } from '../entities/user.schema';
+import { UserMapper } from '../mappers/user.mapper';
 
 @Injectable()
-export class UsersDocumentRepository {
+export class UsersDocumentRepository extends BaseRepository<
+  UserSchemaClass,
+  User
+> {
   constructor(
     @InjectModel(UserSchemaClass.name)
     private readonly usersModel: Model<UserSchemaClass>,
-  ) {}
+  ) {
+    super(usersModel, ['firstName', 'lastName', 'email']);
+  }
 
   async create(data: Partial<User>): Promise<User> {
     const persistenceModel = UserMapper.toPersistence(data);
@@ -35,6 +44,14 @@ export class UsersDocumentRepository {
 
     const userObject = await this.usersModel.findOne({ email });
     return userObject ? UserMapper.toDomain(userObject) : null;
+  }
+
+  async paginate(
+    query: PaginationQueryDto,
+    options: PaginationOptions<UserSchemaClass>,
+    search?: string,
+  ): Promise<PaginationResponseDto<User>> {
+    return super.paginate(query, options, UserMapper, search);
   }
 
   async update(
