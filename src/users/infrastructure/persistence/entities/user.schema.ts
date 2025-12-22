@@ -6,6 +6,7 @@ import { EntityDocumentHelper } from 'src/utils/document-entity-helper';
 export type UserSchemaDocument = HydratedDocument<UserSchemaClass>;
 
 @Schema({
+  collection: 'users',
   timestamps: true,
   toJSON: {
     virtuals: true,
