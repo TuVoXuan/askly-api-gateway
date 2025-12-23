@@ -56,6 +56,10 @@ export class UsersService {
     return this.usersRepository.findById(id);
   }
 
+  findByIdHasPassword(id: User['id']): Promise<NullableType<User>> {
+    return this.usersRepository.findByIdHasPassword(id);
+  }
+
   findByIds(ids: User['id'][]): Promise<User[]> {
     return this.usersRepository.findByIds(ids);
   }
@@ -70,6 +74,10 @@ export class UsersService {
 
   findByEmail(email: User['email']): Promise<NullableType<User>> {
     return this.usersRepository.findByEmail(email);
+  }
+
+  findByEmailHasPassword(email: User['email']): Promise<NullableType<User>> {
+    return this.usersRepository.findByEmailHasPassword(email);
   }
 
   async update(

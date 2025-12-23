@@ -34,6 +34,11 @@ export class UsersDocumentRepository extends BaseRepository<
     return userObject ? UserMapper.toDomain(userObject) : null;
   }
 
+  async findByIdHasPassword(id: User['id']): Promise<NullableType<User>> {
+    const userObject = await this.usersModel.findById(id);
+    return userObject ? UserMapper.toDomainWithPassword(userObject) : null;
+  }
+
   async findByIds(ids: User['id'][]): Promise<User[]> {
     const userObjects = await this.usersModel.find({ _id: { $in: ids } });
     return userObjects.map((userObject) => UserMapper.toDomain(userObject));
@@ -44,6 +49,15 @@ export class UsersDocumentRepository extends BaseRepository<
 
     const userObject = await this.usersModel.findOne({ email });
     return userObject ? UserMapper.toDomain(userObject) : null;
+  }
+
+  async findByEmailHasPassword(
+    email: User['email'],
+  ): Promise<NullableType<User>> {
+    if (!email) return null;
+
+    const userObject = await this.usersModel.findOne({ email });
+    return userObject ? UserMapper.toDomainWithPassword(userObject) : null;
   }
 
   async paginate(

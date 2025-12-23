@@ -85,8 +85,7 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   findAll(
     @Query() query: PaginationQueryDto,
-    @Query('search') search?: string,
   ): Promise<PaginationResponseDto<User>> {
-    return this.usersService.paginate(query, search);
+    return this.usersService.paginate(query, query?.search);
   }
 }

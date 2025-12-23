@@ -18,6 +18,23 @@ export class UserMapper {
     return domainEntity;
   }
 
+  static toDomainWithPassword(raw: UserSchemaClass): User {
+    const domainEntity = new User();
+    domainEntity.id = raw._id?.toString();
+    domainEntity.email = raw.email;
+    domainEntity.provider = raw.provider;
+    domainEntity.socialId = raw.socialId;
+    domainEntity.firstName = raw.firstName;
+    domainEntity.lastName = raw.lastName;
+    domainEntity.password = raw.password;
+    domainEntity.photo = raw.photo;
+    domainEntity.createdAt = raw.createdAt;
+    domainEntity.updatedAt = raw.updatedAt;
+    domainEntity.deletedAt = raw.deletedAt;
+
+    return domainEntity;
+  }
+
   static toPersistence(domainEntity: Partial<User>): Partial<UserSchemaClass> {
     const persistenceObj: Partial<UserSchemaClass> = {};
     if (domainEntity.id && typeof domainEntity.id === 'string') {
